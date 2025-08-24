@@ -8,8 +8,8 @@ a prettier rocket launch tracking app
 <img src="https://github.com/user-attachments/assets/73702b95-cd84-4014-9a9c-b32a340b8724" width="300" />
 <img src="https://github.com/user-attachments/assets/fb8a4a98-4703-4d7b-b2f2-6e88a7489a01" width="300" />
 
-Built with React Native
-Using [TheSpaceDevs](https://thespacedevs.com/llapi) API
+built using react native
+using [TheSpaceDevs](https://thespacedevs.com/llapi) API
 
 Commands
 ```

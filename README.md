@@ -1,4 +1,4 @@
-# Launch Window <img src="https://github.com/user-attachments/assets/a00f1a67-e20a-402c-9bd2-fcf11624ea65" width="200" />
+# <img src="https://github.com/user-attachments/assets/a00f1a67-e20a-402c-9bd2-fcf11624ea65" width="200" /> Launch Window
 
 a prettier rocket launch tracking app
 

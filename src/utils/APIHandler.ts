@@ -10,8 +10,6 @@ const APOD_API_KEY = NASA_API_KEY;
 
 const DEBUG = true;
 
-
-
 export async function fetchLaunches(type: string, limit: number, offset: number){
     console.log("Fetching "+limit+" "+type+" Launches with an offset of "+offset)
     return await fetch(LAUNCH_API_URL+"launch/"+type+"/?limit="+limit+"&offset="+offset+"&hide_recent_previous=true")

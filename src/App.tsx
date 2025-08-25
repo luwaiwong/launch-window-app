@@ -41,8 +41,6 @@ export default function App(props) {
   Query.useLaunchesQuery('upcoming',100,0)
   Query.useUpcomingEventsQuery();
 
-  
-
   const startRefreshAnimation = () => {Animated.loop(
       Animated.sequence([
         Animated.timing(

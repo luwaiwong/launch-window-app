@@ -2,8 +2,8 @@
 
 {
   "expo": {
-    "name": "Nominal",
-    "slug": "nominal",
+    "name": "Launch Window",
+    "slug": "launch-window-app",
     "version": "0.6.0",
     "orientation": "portrait",
     "icon": "./src/assets/icon-temp.png",

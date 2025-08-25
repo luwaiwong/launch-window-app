@@ -1,5 +1,5 @@
 {
-  "name": "nominal",
+  "name": "launch-window-app",
   "version": "0.6.0",
   "main": "./src/index.tsx",
   "scripts": {

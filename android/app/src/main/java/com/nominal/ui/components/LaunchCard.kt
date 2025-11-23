@@ -121,7 +121,7 @@ fun LaunchCard(
 
 @Composable
 private fun StatusBadge(launch: Launch) {
-    val (statusText, statusColor) = when {
+    val (statusText, statusColor): Pair<String, androidx.compose.ui.graphics.Color> = when {
         launch.isSuccessful() -> "Success" to StatusSuccess
         launch.isFailed() -> "Failed" to StatusError
         launch.isPartialFailure() -> "Partial" to StatusWarning

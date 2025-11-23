@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Nominal</string>
+    <string name="notification_channel_name">Launch Notifications</string>
+    <string name="notification_channel_description">Notifications for upcoming rocket launches and events</string>
+</resources>

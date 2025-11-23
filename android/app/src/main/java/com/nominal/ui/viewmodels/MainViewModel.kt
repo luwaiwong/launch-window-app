@@ -1,0 +1,148 @@
+package com.nominal.ui.viewmodels
+
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
+import com.nominal.data.models.CachedData
+import com.nominal.data.repository.NominalRepository
+import com.nominal.data.repository.SettingsRepository
+import com.nominal.data.repository.UserSettings
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+
+sealed class DataState {
+    object Loading : DataState()
+    data class Success(val data: CachedData) : DataState()
+    data class Error(val message: String) : DataState()
+}
+
+class MainViewModel(application: Application) : AndroidViewModel(application) {
+
+    private val repository = NominalRepository(application)
+    private val settingsRepository = SettingsRepository(application)
+
+    private val _dataState = MutableStateFlow<DataState>(DataState.Loading)
+    val dataState: StateFlow<DataState> = _dataState.asStateFlow()
+
+    private val _settings = MutableStateFlow(UserSettings())
+    val settings: StateFlow<UserSettings> = _settings.asStateFlow()
+
+    init {
+        loadSettings()
+        loadData()
+    }
+
+    private fun loadSettings() {
+        viewModelScope.launch {
+            settingsRepository.settings.collect { settings ->
+                _settings.value = settings
+            }
+        }
+    }
+
+    fun loadData(forceRefresh: Boolean = false) {
+        viewModelScope.launch {
+            _dataState.value = DataState.Loading
+            val result = repository.fetchAllData(forceRefresh)
+            _dataState.value = if (result.isSuccess) {
+                DataState.Success(result.getOrThrow())
+            } else {
+                DataState.Error(result.exceptionOrNull()?.message ?: "Unknown error")
+            }
+        }
+    }
+
+    fun clearCache() {
+        repository.clearCache()
+        loadData(forceRefresh = true)
+    }
+
+    fun getLastCallTimestamp(): Long? {
+        return repository.getLastCallTimestamp()
+    }
+
+    // Settings updates
+    fun updateEnableNotifications(enabled: Boolean) {
+        viewModelScope.launch {
+            settingsRepository.updateEnableNotifications(enabled)
+        }
+    }
+
+    fun updateNotifLaunch24h(enabled: Boolean) {
+        viewModelScope.launch {
+            settingsRepository.updateNotifLaunch24h(enabled)
+        }
+    }
+
+    fun updateNotifLaunch12h(enabled: Boolean) {
+        viewModelScope.launch {
+            settingsRepository.updateNotifLaunch12h(enabled)
+        }
+    }
+
+    fun updateNotifLaunch1h(enabled: Boolean) {
+        viewModelScope.launch {
+            settingsRepository.updateNotifLaunch1h(enabled)
+        }
+    }
+
+    fun updateNotifLaunch30m(enabled: Boolean) {
+        viewModelScope.launch {
+            settingsRepository.updateNotifLaunch30m(enabled)
+        }
+    }
+
+    fun updateNotifLaunch10m(enabled: Boolean) {
+        viewModelScope.launch {
+            settingsRepository.updateNotifLaunch10m(enabled)
+        }
+    }
+
+    fun updateNotifLaunchAtTime(enabled: Boolean) {
+        viewModelScope.launch {
+            settingsRepository.updateNotifLaunchAtTime(enabled)
+        }
+    }
+
+    fun updateNotifEvent24h(enabled: Boolean) {
+        viewModelScope.launch {
+            settingsRepository.updateNotifEvent24h(enabled)
+        }
+    }
+
+    fun updateNotifEvent12h(enabled: Boolean) {
+        viewModelScope.launch {
+            settingsRepository.updateNotifEvent12h(enabled)
+        }
+    }
+
+    fun updateNotifEvent1h(enabled: Boolean) {
+        viewModelScope.launch {
+            settingsRepository.updateNotifEvent1h(enabled)
+        }
+    }
+
+    fun updateFyShowPastLaunches(enabled: Boolean) {
+        viewModelScope.launch {
+            settingsRepository.updateFyShowPastLaunches(enabled)
+        }
+    }
+
+    fun updateFyShowPastEvents(enabled: Boolean) {
+        viewModelScope.launch {
+            settingsRepository.updateFyShowPastEvents(enabled)
+        }
+    }
+
+    fun updateDevMode(enabled: Boolean) {
+        viewModelScope.launch {
+            settingsRepository.updateDevMode(enabled)
+        }
+    }
+
+    fun getRepository(): NominalRepository {
+        return repository
+    }
+}

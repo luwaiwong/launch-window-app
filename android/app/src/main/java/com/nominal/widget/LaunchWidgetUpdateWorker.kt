@@ -22,6 +22,7 @@ class LaunchWidgetUpdateWorker(
 
     companion object {
         private const val WORK_NAME = "LaunchWidgetUpdateWork"
+        private const val DYNAMIC_WORK_NAME = "LaunchWidgetDynamicUpdateWork"
 
         fun schedulePeriodicUpdates(context: Context) {
             val constraints = Constraints.Builder()
@@ -46,6 +47,27 @@ class LaunchWidgetUpdateWorker(
 
         fun cancelPeriodicUpdates(context: Context) {
             WorkManager.getInstance(context).cancelUniqueWork(WORK_NAME)
+        }
+
+        /**
+         * Schedule a one-time update at a specific interval (used for dynamic updates)
+         * This is called when widget needs to update more frequently as launch approaches
+         */
+        fun scheduleNextUpdate(context: Context, intervalMinutes: Long) {
+            val constraints = Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .build()
+
+            val updateRequest = OneTimeWorkRequestBuilder<LaunchWidgetUpdateWorker>()
+                .setInitialDelay(intervalMinutes, TimeUnit.MINUTES)
+                .setConstraints(constraints)
+                .build()
+
+            WorkManager.getInstance(context).enqueueUniqueWork(
+                DYNAMIC_WORK_NAME,
+                ExistingWorkPolicy.REPLACE,
+                updateRequest
+            )
         }
     }
 }

@@ -76,14 +76,27 @@ class LaunchWidget : AppWidgetProvider() {
 
                     // Update countdown
                     val countdown = DateUtils.getCountdown(nextLaunch.net)
-                    val countdownText = String.format(
-                        "T-%02d:%02d:%02d:%02d",
-                        countdown.days,
-                        countdown.hours,
-                        countdown.minutes,
-                        countdown.seconds
-                    )
+                    val countdownText = if (countdown.isPast) {
+                        String.format(
+                            "T+%02d:%02d:%02d:%02d",
+                            countdown.days,
+                            countdown.hours,
+                            countdown.minutes,
+                            countdown.seconds
+                        )
+                    } else {
+                        String.format(
+                            "T-%02d:%02d:%02d:%02d",
+                            countdown.days,
+                            countdown.hours,
+                            countdown.minutes,
+                            countdown.seconds
+                        )
+                    }
                     views.setTextViewText(R.id.widget_countdown, countdownText)
+
+                    // Schedule next update based on time until launch
+                    scheduleNextUpdate(context, countdown)
                 } else {
                     views.setTextViewText(R.id.widget_launch_name, "No upcoming launches")
                     views.setTextViewText(R.id.widget_provider, "")
@@ -103,6 +116,28 @@ class LaunchWidget : AppWidgetProvider() {
                 appWidgetManager.updateAppWidget(appWidgetId, views)
             }
         }
+    }
+
+    /**
+     * Schedule next update based on how close the launch is
+     * - < 10 minutes: Every 1 minute
+     * - 10-30 minutes: Every 5 minutes
+     * - 30-60 minutes: Every 10 minutes
+     * - > 1 hour: Every 30 minutes
+     */
+    private fun scheduleNextUpdate(context: Context, countdown: DateUtils.Countdown) {
+        val totalMinutes = countdown.days * 24 * 60 + countdown.hours * 60 + countdown.minutes
+
+        val updateIntervalMinutes = when {
+            countdown.isPast && totalMinutes < 60 -> 5L // 5 min after launch for updates
+            countdown.isPast -> 30L // Back to normal after 1 hour
+            totalMinutes < 10 -> 1L // Every minute when < 10 min
+            totalMinutes < 30 -> 5L // Every 5 min when < 30 min
+            totalMinutes < 60 -> 10L // Every 10 min when < 1 hour
+            else -> 30L // Every 30 min when > 1 hour
+        }
+
+        LaunchWidgetUpdateWorker.scheduleNextUpdate(context, updateIntervalMinutes)
     }
 
     companion object {

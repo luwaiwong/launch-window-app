@@ -3,4 +3,5 @@
     <string name="app_name">Nominal</string>
     <string name="notification_channel_name">Launch Notifications</string>
     <string name="notification_channel_description">Notifications for upcoming rocket launches and events</string>
+    <string name="widget_description">Shows the next upcoming rocket launch with live countdown</string>
 </resources>

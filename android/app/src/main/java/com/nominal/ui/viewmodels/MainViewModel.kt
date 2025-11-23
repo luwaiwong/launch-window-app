@@ -6,6 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.nominal.data.models.CachedData
 import com.nominal.data.repository.NominalRepository
 import com.nominal.data.repository.SettingsRepository
+import com.nominal.data.repository.ThemeRepository
+import com.nominal.data.repository.ThemeSettings
 import com.nominal.data.repository.UserSettings
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,6 +24,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository = NominalRepository(application)
     private val settingsRepository = SettingsRepository(application)
+    private val themeRepository = ThemeRepository(application)
 
     private val _dataState = MutableStateFlow<DataState>(DataState.Loading)
     val dataState: StateFlow<DataState> = _dataState.asStateFlow()
@@ -29,8 +32,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _settings = MutableStateFlow(UserSettings())
     val settings: StateFlow<UserSettings> = _settings.asStateFlow()
 
+    private val _themeSettings = MutableStateFlow(ThemeSettings())
+    val themeSettings: StateFlow<ThemeSettings> = _themeSettings.asStateFlow()
+
     init {
         loadSettings()
+        loadThemeSettings()
         loadData()
     }
 
@@ -38,6 +45,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             settingsRepository.settings.collect { settings ->
                 _settings.value = settings
+            }
+        }
+    }
+
+    private fun loadThemeSettings() {
+        viewModelScope.launch {
+            themeRepository.themeSettings.collect { themeSettings ->
+                _themeSettings.value = themeSettings
             }
         }
     }
@@ -144,5 +159,36 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun getRepository(): NominalRepository {
         return repository
+    }
+
+    // Theme settings updates
+    fun setUseDynamicColor(enabled: Boolean) {
+        viewModelScope.launch {
+            themeRepository.setUseDynamicColor(enabled)
+        }
+    }
+
+    fun setCustomSeedColor(color: Int) {
+        viewModelScope.launch {
+            themeRepository.setCustomSeedColor(color)
+        }
+    }
+
+    fun setCustomAccentColor(color: Int) {
+        viewModelScope.launch {
+            themeRepository.setCustomAccentColor(color)
+        }
+    }
+
+    fun setCustomBackgroundColor(color: Int) {
+        viewModelScope.launch {
+            themeRepository.setCustomBackgroundColor(color)
+        }
+    }
+
+    fun resetThemeToDefaults() {
+        viewModelScope.launch {
+            themeRepository.resetToDefaults()
+        }
     }
 }

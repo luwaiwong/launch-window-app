@@ -3,12 +3,13 @@ package com.nominal.ui.screens
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
+import com.nominal.ui.components.ColorPicker
 import com.nominal.ui.theme.Foreground
 import com.nominal.ui.theme.SubForeground
 import com.nominal.ui.viewmodels.MainViewModel
@@ -20,6 +21,8 @@ fun SettingsScreen(
     viewModel: MainViewModel
 ) {
     val settings by viewModel.settings.collectAsState()
+    val themeSettings by viewModel.themeSettings.collectAsState()
+    var showColorPicker by remember { mutableStateOf(false) }
 
     LazyColumn(
         modifier = Modifier
@@ -124,6 +127,72 @@ fun SettingsScreen(
                 checked = settings.fyShowPastEvents,
                 onCheckedChange = { viewModel.updateFyShowPastEvents(it) }
             )
+        }
+
+        item {
+            Divider()
+        }
+
+        item {
+            SectionHeader(text = "Theme & Colors")
+        }
+
+        item {
+            SettingSwitch(
+                title = "Use Dynamic Colors (Android 12+)",
+                checked = themeSettings.useDynamicColor,
+                onCheckedChange = { viewModel.setUseDynamicColor(it) }
+            )
+        }
+
+        if (!themeSettings.useDynamicColor) {
+            item {
+                Button(
+                    onClick = { showColorPicker = !showColorPicker },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp)
+                ) {
+                    Text(if (showColorPicker) "Hide Color Picker" else "Customize Colors")
+                }
+            }
+
+            if (showColorPicker) {
+                item {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant
+                        )
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            Text(
+                                text = "Pick Accent Color",
+                                style = MaterialTheme.typography.titleMedium,
+                                color = Foreground
+                            )
+
+                            ColorPicker(
+                                onColorSelected = { color ->
+                                    viewModel.setCustomAccentColor(color.toArgb())
+                                }
+                            )
+
+                            OutlinedButton(
+                                onClick = { viewModel.resetThemeToDefaults() },
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text("Reset to Default Colors")
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         item {

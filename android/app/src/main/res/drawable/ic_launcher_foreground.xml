@@ -1,0 +1,10 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Rocket icon for Nominal app -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,24 L54,48 M54,24 L46,32 M54,24 L62,32 M46,56 L46,64 L42,72 M62,56 L62,64 L66,72 M54,48 C54,48 38,52 38,64 C38,76 46,72 46,72 M54,48 C54,48 70,52 70,64 C70,76 62,72 62,72 M48,40 C48,42 50,44 52,44 C54,44 56,42 56,40 C56,38 54,36 52,36 C50,36 48,38 48,40"/>
+</vector>

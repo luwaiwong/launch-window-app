@@ -226,6 +226,23 @@ fun SettingsScreen(
             }
 
             item {
+                var notificationCount by remember { mutableStateOf<Int?>(null) }
+
+                LaunchedEffect(Unit) {
+                    notificationCount = viewModel.getScheduledNotificationCount()
+                }
+
+                notificationCount?.let { count ->
+                    Text(
+                        text = "Scheduled notifications: $count",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = SubForeground,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                    )
+                }
+            }
+
+            item {
                 Button(
                     onClick = { viewModel.loadData(forceRefresh = true) },
                     modifier = Modifier

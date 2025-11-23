@@ -4,6 +4,7 @@ import android.content.Context
 import com.google.gson.Gson
 import com.nominal.data.api.RetrofitClient
 import com.nominal.data.models.*
+import com.nominal.notifications.NotificationScheduler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
@@ -22,8 +23,12 @@ class NominalRepository(private val context: Context) {
 
     /**
      * Fetches all data from APIs or cache
+     * Automatically schedules notifications when new data is fetched
      */
-    suspend fun fetchAllData(forceRefresh: Boolean = false): Result<CachedData> = withContext(Dispatchers.IO) {
+    suspend fun fetchAllData(
+        forceRefresh: Boolean = false,
+        userSettings: UserSettings? = null
+    ): Result<CachedData> = withContext(Dispatchers.IO) {
         try {
             val cachedData = loadCachedData()
             val now = System.currentTimeMillis()
@@ -51,6 +56,11 @@ class NominalRepository(private val context: Context) {
 
             // Save to cache
             saveCachedData(newData)
+
+            // Schedule notifications for new data if settings provided
+            userSettings?.let { settings ->
+                scheduleNotificationsForData(newData, settings)
+            }
 
             Result.success(newData)
         } catch (e: Exception) {
@@ -192,5 +202,44 @@ class NominalRepository(private val context: Context) {
      */
     fun getDashboardArticles(articles: List<Article>?): List<Article> {
         return articles?.take(3) ?: emptyList()
+    }
+
+    /**
+     * Schedule notifications for launches and events
+     */
+    private fun scheduleNotificationsForData(data: CachedData, settings: UserSettings) {
+        // Schedule launch notifications
+        data.launches?.upcoming?.let { launches ->
+            NotificationScheduler.scheduleLaunchNotifications(context, launches, settings)
+        }
+
+        // Schedule event notifications
+        data.events?.upcoming?.let { events ->
+            NotificationScheduler.scheduleEventNotifications(context, events, settings)
+        }
+    }
+
+    /**
+     * Manually reschedule all notifications (called when settings change)
+     */
+    suspend fun rescheduleNotifications(userSettings: UserSettings) = withContext(Dispatchers.IO) {
+        val cachedData = loadCachedData()
+        cachedData?.let { data ->
+            scheduleNotificationsForData(data, userSettings)
+        }
+    }
+
+    /**
+     * Cancel all scheduled notifications
+     */
+    fun cancelAllNotifications() {
+        NotificationScheduler.cancelAllNotifications(context)
+    }
+
+    /**
+     * Get count of scheduled notifications
+     */
+    suspend fun getScheduledNotificationCount(): Int {
+        return NotificationScheduler.getScheduledNotificationCount(context)
     }
 }

@@ -60,7 +60,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun loadData(forceRefresh: Boolean = false) {
         viewModelScope.launch {
             _dataState.value = DataState.Loading
-            val result = repository.fetchAllData(forceRefresh)
+            val result = repository.fetchAllData(forceRefresh, _settings.value)
             _dataState.value = if (result.isSuccess) {
                 DataState.Success(result.getOrThrow())
             } else {
@@ -82,60 +82,75 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun updateEnableNotifications(enabled: Boolean) {
         viewModelScope.launch {
             settingsRepository.updateEnableNotifications(enabled)
+            // Reschedule or cancel notifications based on new setting
+            if (enabled) {
+                repository.rescheduleNotifications(_settings.value)
+            } else {
+                repository.cancelAllNotifications()
+            }
         }
     }
 
     fun updateNotifLaunch24h(enabled: Boolean) {
         viewModelScope.launch {
             settingsRepository.updateNotifLaunch24h(enabled)
+            repository.rescheduleNotifications(_settings.value)
         }
     }
 
     fun updateNotifLaunch12h(enabled: Boolean) {
         viewModelScope.launch {
             settingsRepository.updateNotifLaunch12h(enabled)
+            repository.rescheduleNotifications(_settings.value)
         }
     }
 
     fun updateNotifLaunch1h(enabled: Boolean) {
         viewModelScope.launch {
             settingsRepository.updateNotifLaunch1h(enabled)
+            repository.rescheduleNotifications(_settings.value)
         }
     }
 
     fun updateNotifLaunch30m(enabled: Boolean) {
         viewModelScope.launch {
             settingsRepository.updateNotifLaunch30m(enabled)
+            repository.rescheduleNotifications(_settings.value)
         }
     }
 
     fun updateNotifLaunch10m(enabled: Boolean) {
         viewModelScope.launch {
             settingsRepository.updateNotifLaunch10m(enabled)
+            repository.rescheduleNotifications(_settings.value)
         }
     }
 
     fun updateNotifLaunchAtTime(enabled: Boolean) {
         viewModelScope.launch {
             settingsRepository.updateNotifLaunchAtTime(enabled)
+            repository.rescheduleNotifications(_settings.value)
         }
     }
 
     fun updateNotifEvent24h(enabled: Boolean) {
         viewModelScope.launch {
             settingsRepository.updateNotifEvent24h(enabled)
+            repository.rescheduleNotifications(_settings.value)
         }
     }
 
     fun updateNotifEvent12h(enabled: Boolean) {
         viewModelScope.launch {
             settingsRepository.updateNotifEvent12h(enabled)
+            repository.rescheduleNotifications(_settings.value)
         }
     }
 
     fun updateNotifEvent1h(enabled: Boolean) {
         viewModelScope.launch {
             settingsRepository.updateNotifEvent1h(enabled)
+            repository.rescheduleNotifications(_settings.value)
         }
     }
 
@@ -190,5 +205,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             themeRepository.resetToDefaults()
         }
+    }
+
+    /**
+     * Get count of scheduled notifications (for developer mode)
+     */
+    suspend fun getScheduledNotificationCount(): Int {
+        return repository.getScheduledNotificationCount()
     }
 }

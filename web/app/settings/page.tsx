@@ -3,10 +3,14 @@
 import { useEffect, useState } from 'react';
 import { storage } from '@/lib/storage';
 import { UserSettings } from '@/lib/types';
+import { useTheme } from '@/components/ui/ThemeProvider';
+import { ColorPicker, ColorPresets } from '@/components/ui/ColorPicker';
+import { THEME } from '@/lib/config';
 
 export default function Settings() {
   const [settings, setSettings] = useState<UserSettings | null>(null);
   const [favorites, setFavorites] = useState<string[]>([]);
+  const { colors, updateColors, resetColors, useCustomTheme, setUseCustomTheme } = useTheme();
 
   useEffect(() => {
     setSettings(storage.getSettings());
@@ -55,6 +59,167 @@ export default function Settings() {
         <h1 className="text-3xl font-bold text-foreground mb-2">Settings</h1>
         <p className="text-muted">Manage your preferences</p>
       </div>
+
+      {/* Theme Customization */}
+      <section className="mb-8 bg-highlight rounded-lg p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-semibold text-foreground">Theme Customization</h2>
+          <div className="flex items-center gap-3">
+            <ToggleItem
+              label="Use Custom Theme"
+              value={useCustomTheme}
+              onChange={() => setUseCustomTheme(!useCustomTheme)}
+            />
+          </div>
+        </div>
+
+        <p className="text-sm text-muted mb-6">
+          Customize the app's color scheme to your liking. Changes apply instantly across all pages.
+        </p>
+
+        <div className="space-y-6">
+          <ColorPicker
+            label="Background"
+            description="Main background color"
+            color={colors.background}
+            onChange={(color) => updateColors({ background: color })}
+          />
+
+          <ColorPicker
+            label="Highlight"
+            description="Card and section backgrounds"
+            color={colors.highlight}
+            onChange={(color) => updateColors({ highlight: color })}
+          />
+
+          <ColorPicker
+            label="Foreground"
+            description="Primary text color"
+            color={colors.foreground}
+            onChange={(color) => updateColors({ foreground: color })}
+          />
+
+          <ColorPicker
+            label="Accent"
+            description="Primary action and highlight color"
+            color={colors.accent}
+            onChange={(color) => updateColors({ accent: color })}
+          />
+
+          <ColorPicker
+            label="Success"
+            description="Success states and indicators"
+            color={colors.success}
+            onChange={(color) => updateColors({ success: color })}
+          />
+
+          <ColorPicker
+            label="Warning"
+            description="Warning states and indicators"
+            color={colors.warning}
+            onChange={(color) => updateColors({ warning: color })}
+          />
+
+          <ColorPicker
+            label="Error"
+            description="Error states and indicators"
+            color={colors.error}
+            onChange={(color) => updateColors({ error: color })}
+          />
+
+          <ColorPicker
+            label="Muted"
+            description="Secondary text and subtle elements"
+            color={colors.muted}
+            onChange={(color) => updateColors({ muted: color })}
+          />
+        </div>
+
+        {/* Color Presets */}
+        <div className="mt-6 pt-6 border-t border-muted/20">
+          <h3 className="text-sm font-semibold text-foreground mb-3">Quick Presets</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <button
+              onClick={() => {
+                updateColors(THEME.colors);
+                setUseCustomTheme(true);
+              }}
+              className="px-4 py-2 bg-background border border-muted/20 rounded-lg hover:border-accent transition-colors text-sm"
+            >
+              Default Dark
+            </button>
+            <button
+              onClick={() => {
+                updateColors({
+                  background: '#0a0e27',
+                  highlight: '#1a1f3a',
+                  foreground: '#e2e8f0',
+                  accent: '#818cf8',
+                  success: '#34d399',
+                  warning: '#fbbf24',
+                  error: '#f87171',
+                  muted: '#64748b',
+                });
+                setUseCustomTheme(true);
+              }}
+              className="px-4 py-2 bg-background border border-muted/20 rounded-lg hover:border-accent transition-colors text-sm"
+            >
+              Midnight Blue
+            </button>
+            <button
+              onClick={() => {
+                updateColors({
+                  background: '#18181b',
+                  highlight: '#27272a',
+                  foreground: '#fafafa',
+                  accent: '#a855f7',
+                  success: '#4ade80',
+                  warning: '#facc15',
+                  error: '#ef4444',
+                  muted: '#71717a',
+                });
+                setUseCustomTheme(true);
+              }}
+              className="px-4 py-2 bg-background border border-muted/20 rounded-lg hover:border-accent transition-colors text-sm"
+            >
+              Purple Haze
+            </button>
+            <button
+              onClick={() => {
+                updateColors({
+                  background: '#1c1917',
+                  highlight: '#292524',
+                  foreground: '#fafaf9',
+                  accent: '#f97316',
+                  success: '#22c55e',
+                  warning: '#eab308',
+                  error: '#dc2626',
+                  muted: '#78716c',
+                });
+                setUseCustomTheme(true);
+              }}
+              className="px-4 py-2 bg-background border border-muted/20 rounded-lg hover:border-accent transition-colors text-sm"
+            >
+              Warm Earth
+            </button>
+          </div>
+        </div>
+
+        {/* Reset Button */}
+        <div className="mt-6 pt-6 border-t border-muted/20">
+          <button
+            onClick={() => {
+              resetColors();
+              if (confirm('Theme reset to default. Refresh the page to see all changes.')) {
+                window.location.reload();
+              }
+            }}
+            className="px-6 py-3 bg-muted/20 text-foreground rounded-lg hover:bg-muted/30 transition-colors"
+          >
+            Reset to Default Theme
+          </button>
+        </div>
+      </section>
 
       {/* Notification Settings */}
       <section className="mb-8 bg-highlight rounded-lg p-6">

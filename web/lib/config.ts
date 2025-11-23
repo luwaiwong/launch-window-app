@@ -52,4 +52,15 @@ export const DEFAULT_SETTINGS = {
   },
   developerMode: false,
   favorites: [],
+  theme: {
+    background: '#1e1e1e',
+    highlight: '#252627',
+    foreground: '#D8DEE9',
+    accent: '#5E81AC',
+    success: '#A3DF95',
+    warning: '#FFDA61',
+    error: '#F75D55',
+    muted: '#4C566A',
+  },
+  useCustomTheme: false,
 };

@@ -174,11 +174,24 @@ export interface ForYouSettings {
   showPastEvents: boolean;
 }
 
+export interface ThemeColors {
+  background: string;
+  highlight: string;
+  foreground: string;
+  accent: string;
+  success: string;
+  warning: string;
+  error: string;
+  muted: string;
+}
+
 export interface UserSettings {
   notifications: NotificationSettings;
   forYou: ForYouSettings;
   developerMode: boolean;
   favorites: string[]; // Array of launch IDs
+  theme: ThemeColors;
+  useCustomTheme: boolean;
 }
 
 // Combined feed item type for "For You" page

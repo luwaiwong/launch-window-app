@@ -25,7 +25,7 @@ const nextConfig: NextConfig = {
         hostname: '*.spaceflightnewsapi.net',
         pathname: '/**',
       },
-      // Space news websites (for article images)
+      // Space news websites (for article images) - HTTPS
       {
         protocol: 'https',
         hostname: 'spacepolicyonline.com',
@@ -74,6 +74,22 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'europeanspaceflight.com',
+        pathname: '/**',
+      },
+      // Space news websites - HTTP (for legacy/non-HTTPS sources)
+      {
+        protocol: 'http',
+        hostname: 'spaceflightnow.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'http',
+        hostname: 'spacepolicyonline.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'http',
+        hostname: 'spacenews.com',
         pathname: '/**',
       },
     ],

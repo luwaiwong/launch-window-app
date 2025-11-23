@@ -3,6 +3,7 @@ package com.nominal.ui.screens
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -77,14 +78,23 @@ fun ForYouScreen(
             }
         }
         is DataState.Error -> {
-            Box(
+            Column(
                 modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Error loading data",
-                    color = Foreground
+                    text = state.message,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = Foreground,
+                    modifier = Modifier.padding(horizontal = 32.dp, vertical = 16.dp)
                 )
+                Button(
+                    onClick = { viewModel.loadData(forceRefresh = true) },
+                    modifier = Modifier.padding(top = 16.dp)
+                ) {
+                    Text("Retry")
+                }
             }
         }
         is DataState.Loading -> {

@@ -96,14 +96,23 @@ fun LaunchesScreen(
                     }
                 }
                 is DataState.Error -> {
-                    Box(
+                    Column(
                         modifier = Modifier.fillMaxSize(),
-                        contentAlignment = androidx.compose.ui.Alignment.Center
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = "Error loading launches",
-                            color = Foreground
+                            text = state.message,
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = Foreground,
+                            modifier = Modifier.padding(horizontal = 32.dp, vertical = 16.dp)
                         )
+                        androidx.compose.material3.Button(
+                            onClick = { viewModel.loadData(forceRefresh = true) },
+                            modifier = Modifier.padding(top = 16.dp)
+                        ) {
+                            Text("Retry")
+                        }
                     }
                 }
                 is DataState.Loading -> {

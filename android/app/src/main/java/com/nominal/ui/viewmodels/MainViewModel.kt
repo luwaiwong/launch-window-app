@@ -9,6 +9,7 @@ import com.nominal.data.repository.SettingsRepository
 import com.nominal.data.repository.ThemeRepository
 import com.nominal.data.repository.ThemeSettings
 import com.nominal.data.repository.UserSettings
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,6 +26,21 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val repository = NominalRepository(application)
     private val settingsRepository = SettingsRepository(application)
     private val themeRepository = ThemeRepository(application)
+
+    private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
+        throwable.printStackTrace()
+        _dataState.value = DataState.Error(
+            when {
+                throwable.message?.contains("429") == true ->
+                    "API rate limit exceeded. Please try again later."
+                throwable.message?.contains("Unable to resolve host") == true ->
+                    "No internet connection. Please check your network."
+                throwable.message?.contains("timeout") == true ->
+                    "Request timeout. Please try again."
+                else -> "Error: ${throwable.message ?: "Unknown error"}"
+            }
+        )
+    }
 
     private val _dataState = MutableStateFlow<DataState>(DataState.Loading)
     val dataState: StateFlow<DataState> = _dataState.asStateFlow()
@@ -58,13 +74,39 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun loadData(forceRefresh: Boolean = false) {
-        viewModelScope.launch {
-            _dataState.value = DataState.Loading
-            val result = repository.fetchAllData(forceRefresh, _settings.value)
-            _dataState.value = if (result.isSuccess) {
-                DataState.Success(result.getOrThrow())
-            } else {
-                DataState.Error(result.exceptionOrNull()?.message ?: "Unknown error")
+        viewModelScope.launch(exceptionHandler) {
+            try {
+                _dataState.value = DataState.Loading
+                val result = repository.fetchAllData(forceRefresh, _settings.value)
+                _dataState.value = if (result.isSuccess) {
+                    DataState.Success(result.getOrThrow())
+                } else {
+                    val error = result.exceptionOrNull()
+                    DataState.Error(
+                        when {
+                            error?.message?.contains("429") == true ->
+                                "API rate limit exceeded. Please try again in a few minutes."
+                            error?.message?.contains("Unable to resolve host") == true ->
+                                "No internet connection. Please check your network."
+                            error?.message?.contains("timeout") == true ->
+                                "Request timeout. Please try again."
+                            else -> error?.message ?: "Unable to load data"
+                        }
+                    )
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                _dataState.value = DataState.Error(
+                    when {
+                        e.message?.contains("429") == true ->
+                            "API rate limit exceeded. Please try again in a few minutes."
+                        e.message?.contains("Unable to resolve host") == true ->
+                            "No internet connection. Please check your network."
+                        e.message?.contains("timeout") == true ->
+                            "Request timeout. Please try again."
+                        else -> e.message ?: "Unable to load data"
+                    }
+                )
             }
         }
     }

@@ -14,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
@@ -121,12 +122,14 @@ fun LaunchCard(
 
 @Composable
 private fun StatusBadge(launch: Launch) {
-    val (statusText, statusColor): Pair<String, androidx.compose.ui.graphics.Color> = when {
-        launch.isSuccessful() -> "Success" to StatusSuccess
-        launch.isFailed() -> "Failed" to StatusError
-        launch.isPartialFailure() -> "Partial" to StatusWarning
-        else -> launch.status.abbrev ?: "TBD" to Accent
+    val statusPair: Pair<String, Color> = when {
+        launch.isSuccessful() -> Pair("Success", StatusSuccess)
+        launch.isFailed() -> Pair("Failed", StatusError)
+        launch.isPartialFailure() -> Pair("Partial", StatusWarning)
+        else -> Pair(launch.status.abbrev ?: "TBD", Accent)
     }
+    val statusText = statusPair.first
+    val statusColor = statusPair.second
 
     Box(
         modifier = Modifier

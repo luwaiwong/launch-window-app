@@ -5,6 +5,7 @@ import { storage } from '@/lib/storage';
 import { UserSettings } from '@/lib/types';
 import { useTheme } from '@/components/ui/ThemeProvider';
 import { ColorPicker, ColorPresets } from '@/components/ui/ColorPicker';
+import { NotificationPermission } from '@/components/ui/NotificationPermission';
 import { THEME } from '@/lib/config';
 
 export default function Settings() {
@@ -224,8 +225,14 @@ export default function Settings() {
       {/* Notification Settings */}
       <section className="mb-8 bg-highlight rounded-lg p-6">
         <h2 className="text-xl font-semibold text-foreground mb-4">Notifications</h2>
+
+        {/* Notification Permission Status */}
+        <div className="mb-6">
+          <NotificationPermission />
+        </div>
+
         <p className="text-sm text-muted mb-4">
-          Note: Web notifications require browser permission and are not currently implemented.
+          Configure when you want to receive launch notifications. Make sure notifications are enabled above.
         </p>
 
         <div className="space-y-3">

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Navigation, MainContent } from "@/components/ui/Navigation";
 import { ThemeProvider } from "@/components/ui/ThemeProvider";
+import { NotificationScheduler } from "@/components/ui/NotificationScheduler";
 
 export const metadata: Metadata = {
   title: "Nominal - Rocket Launch Tracker",
@@ -17,6 +18,7 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <body className="antialiased">
         <ThemeProvider>
+          <NotificationScheduler />
           <Navigation />
           <MainContent>{children}</MainContent>
         </ThemeProvider>
